@@ -52,41 +52,65 @@ if (-not (Test-Path -Path $configPath)) {
     exit
 }
 
-# Load the environment variables from the config.env file
-$env:DeviceID = Get-Content -Path $configPath | Select-String -Pattern "DeviceID" | ForEach-Object { $_ -replace "DeviceID=", "" }
-$env:DeviceIP = Get-Content -Path $configPath | Select-String -Pattern "DeviceIP" | ForEach-Object { $_ -replace "DeviceIP=", "" }
-$env:LcdIndependence = Get-Content -Path $configPath | Select-String -Pattern "LcdIndependence" | ForEach-Object { $_ -replace "LcdIndependence=", "" }
-$env:LcdIndex = Get-Content -Path $configPath | Select-String -Pattern "LcdIndex" | ForEach-Object { $_ -replace "LcdIndex=", "" }
-$env:LcdClockId = Get-Content -Path $configPath | Select-String -Pattern "LcdClockId" | ForEach-Object { $_ -replace "LcdClockId=", "" }
-$env:DriveLetters = Get-Content -Path $configPath | Select-String -Pattern "SelectedDriveLetters" | ForEach-Object { $_ -replace "SelectedDriveLetters=", "" }
+# Load the environment variables from the config.env file into a hashtable
+$config = @{}
+Get-Content -Path $configPath | ForEach-Object {
+    $name, $value = $_ -split '='
+    $config[$name] = $value
+}
+
+$env:DeviceID = $config['DeviceID']
+$env:DeviceIP = $config['DeviceIP']
+$env:LcdIndependence = $config['LcdIndependence']
+$env:LcdIndex = $config['LcdIndex']
+$env:LcdClockId = $config['LcdClockId']
+$env:DriveLetters = $config['SelectedDriveLetters']
+
+$dllPath = Join-Path -Path $PSScriptRoot -ChildPath "LibreHardwareMonitorLib.dll"
+Add-Type -Path $dllPath
+
+$computer = New-Object LibreHardwareMonitor.Hardware.Computer
+$computer.IsCpuEnabled = $TRUE
 
 while ($true) {
     # Get the system information
-    # CPU Usage
-    $cpuUsage = [math]::Round((Get-Counter '\Processor(_Total)\% Processor Time').CounterSamples.CookedValue)
+    $computer.Open()
 
-    # Get CPU Temperature (Convert from tenths of Kelvin to Celsius)
-    $cpuTempKelvin = Get-WMIObject -Query "SELECT * FROM Win32_PerfFormattedData_Counters_ThermalZoneInformation" -Namespace "root/CIMV2" | Select-Object -ExpandProperty Temperature
-    $cpuTempCelsius = [math]::Round($cpuTempKelvin - 273.15)
+    # Initialize variables to store the values
+    $cpuTotalLoad = 0
+    $cpuPackageTemp = 0
+
+    foreach ($hardware in $computer.Hardware) {
+        if ($hardware.HardwareType -eq [LibreHardwareMonitor.Hardware.HardwareType]::Cpu) {
+            foreach ($sensor in $hardware.Sensors) {
+                if ($sensor.SensorType -eq [LibreHardwareMonitor.Hardware.SensorType]::Load -and $sensor.Name -eq "CPU Total") {
+                    $cpuTotalLoad = $sensor.Value
+                    Write-LogMessage "Found CPU total load sensor: $($sensor.Name) with value: $($sensor.Value)"
+                }
+                if ($sensor.SensorType -eq [LibreHardwareMonitor.Hardware.SensorType]::Temperature -and $sensor.Name -eq "CPU Package") {
+                    $cpuPackageTemp = $sensor.Value
+                    Write-LogMessage "Found CPU package temperature sensor: $($sensor.Name) with value: $($sensor.Value)"
+                }
+            }
+        }
+    }
+
+    $computer.Close()
+
+    # Round the values
+    $cpuTotalLoad = [math]::Round($cpuTotalLoad)
+    $cpuPackageTemp = [math]::Round($cpuPackageTemp)
 
     # RAM Usage Percentage
     $mem = Get-WmiObject -Class Win32_OperatingSystem
     $ramUsagePercentage = [math]::Round(($mem.TotalVisibleMemorySize - $mem.FreePhysicalMemory) / $mem.TotalVisibleMemorySize * 100)
 
     # Run the nvidia-smi command and get the output
-    $gpuInfo = & 'C:\Windows\System32\nvidia-smi.exe' --query-gpu=utilization.gpu,temperature.gpu --format=csv
-
-    # Split the output into lines
-    $gpuInfoLines = $gpuInfo -split "`n"
-
-    # Extract the header and the data line
-    $data = $gpuInfoLines[1]
+    $gpuInfo = & 'C:\Windows\System32\nvidia-smi.exe' --query-gpu=utilization.gpu,temperature.gpu --format=csv,noheader,nounits
 
     # Split the data line into individual values
-    $dataValues = $data -split ','
-
-    # Extract GPU usage and temperature values
-    $gpuUsage = $dataValues[0].Trim() -replace '[^0-9]', ''
+    $dataValues = $gpuInfo -split ','
+    $gpuUsage = $dataValues[0].Trim()
     $gpuTemp = [math]::Round($dataValues[1].Trim())
 
     # Initialize an array to hold the drive usage information
@@ -125,11 +149,11 @@ while ($true) {
 
     # Output the system information
     $systemInfo = [PSCustomObject]@{
-        CPU_Usage_Percentage = "$($cpuUsage)%"
-        CPU_Temperature = "$($cpuTempCelsius)°C"
+        CPU_Usage_Percentage = "$($cpuTotalLoad)%"
+        CPU_Temperature = "$($cpuPackageTemp) C"
         RAM_Usage_Percentage = "$($ramUsagePercentage)%"
         GPU_Usage = "$($gpuUsage)%"
-        GPU_Temperature = "$($gpuTemp)°C"
+        GPU_Temperature = "$($gpuTemp) C"
         HDD_Usage_Percentage = "$($hddUsagePercentage)%"
     }
 

@@ -31,18 +31,18 @@ This project is a PowerShell implementation of the Divoom PC Monitor originally 
 
 1. Clone the repository:
    ```powershell
-   git clone https://github.com/KallanX/Divoom-PC-Monitor-PowerShell.git
-   cd Divoom-PC-Monitor-PowerShell
+   git clone https://gitlab.saintsofvirtue.org/kcarichner/divoom-pc-monitor.git
+   cd divoom-pc-monitor
    ```
 
 2. Run the setup script:
    ```powershell
-   ./DivoomSetup.ps1
+    ./DivoomSetup.ps1
    ```
 
-3. Execute the main script:
+3. Execute the main script (requires admin privileges):
    ```powershell
-   ./DivoomPCMonitor.ps1
+   PowerShell.exe -ExecutionPolicy Bypass -File .\DivoomPCMonitor.ps1 -IntervalInSeconds 10 -Verbose
    ```
 
 4. (Optional) Setup Task Scheduler for automatic execution at logon (requires admin privileges):
@@ -52,6 +52,7 @@ This project is a PowerShell implementation of the Divoom PC Monitor originally 
 
 ## Configuration
 
+- **DivoomPCMonitor.ps1**: Due to the use of the LibraHardwareMonitorLib.dll, the script requires the admin privileges to run.
 - **DivoomSetup.ps1**: This script creates a configuration file required by the main script.
 - **SetupTaskScheduler.ps1**: This script sets up a scheduled task to run the monitor automatically upon user login. Requires administrative privileges.
 
@@ -59,12 +60,12 @@ This project is a PowerShell implementation of the Divoom PC Monitor originally 
 
 - **Admin Privileges**: `SetupTaskScheduler.ps1` must be run in an admin terminal.
 - **GPU Support**: Currently, GPU data is supported only for NVIDIA GPUs using `nvidia-smi.exe`.
-- **CPU Temperature**: The CPU temperature reading is currently inaccurate (stuck at 28°C). This is being worked on.
-- **Third-party Tools**: No third-party tools are required for this script to function.
+- **CPU Temperature**: Fixed CPU temperature monitoring by using an external DLL `LibraHardwareMonitorLib.dll`.
+- **Third-party Tools**: Unfortunately, this script requires the use of third-party tools to monitor system metrics. These tools are included in the repository for convenience.
 
 ## Shortcomings
 
-- **CPU Temperature**: Not working as expected. Currently stuck at 28°C.
+- **CPU Temperature**: CPU usage and temperature are now functional due to use of the external DLL `LibraHardwareMonitorLib.dll`.
 - **Drive Letter Display**: Future updates will include displaying the drive letter alongside the HDD usage percentage.
 
 ## Future Improvements

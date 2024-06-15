@@ -57,7 +57,16 @@ if ($taskExists) {
 # Register the task scheduler
 try {
     Register-ScheduledTask -TaskName $taskName -Action $taskAction -Trigger $taskTrigger -Principal $taskPrincipal -Settings $taskSettings
-    Write-Host "Task scheduler setup complete. Task name: $taskName" -ForegroundColor Green
+    Write-Host "Task scheduler setup complete." -ForegroundColor Green
+    Write-Host "Task name: $taskName" -ForegroundColor Cyan
 } catch {
     Write-Host "Failed to setup task scheduler. Error: $_" -ForegroundColor Red
+    exit
+}
+
+# Prompt user to run the task
+$runTask = Read-Host "Do you want to run the task now? (Y/N)"
+if ($runTask.ToUpper() -eq "Y") {
+    Write-Host "Running task '$taskName'..." -ForegroundColor Cyan
+    Start-ScheduledTask -TaskName $taskName
 }
