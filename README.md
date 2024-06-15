@@ -31,8 +31,8 @@ This project is a PowerShell implementation of the Divoom PC Monitor originally 
 
 1. Clone the repository:
    ```powershell
-   git clone https://gitlab.saintsofvirtue.org/kcarichner/divoom-pc-monitor.git
-   cd divoom-pc-monitor
+   git clone https://github.com/KallanX/Divoom-PC-Monitor-PowerShell.git
+   cd Divoom-PC-Monitor-PowerShell
    ```
 
 2. Run the setup script:
