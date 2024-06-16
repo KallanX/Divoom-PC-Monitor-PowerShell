@@ -147,6 +147,12 @@ while ($true) {
         Write-LogMessage "HDD Usage: $($hddUsagePercentage)%"
     }
 
+    # If the HDD usage percentage is greater than 100, set it to 100
+    if ($hddUsagePercentage -gt 100) {
+        Write-LogMessage "HDD Usage percentage is greater than 100. Setting it to 100."
+        $hddUsagePercentage = 100
+    }
+
     # Output the system information
     $systemInfo = [PSCustomObject]@{
         CPU_Usage_Percentage = "$($cpuTotalLoad)%"
