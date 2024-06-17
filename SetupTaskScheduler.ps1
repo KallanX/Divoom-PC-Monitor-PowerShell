@@ -69,4 +69,12 @@ $runTask = Read-Host "Do you want to run the task now? (Y/N)"
 if ($runTask.ToUpper() -eq "Y") {
     Write-Host "Running task '$taskName'..." -ForegroundColor Cyan
     Start-ScheduledTask -TaskName $taskName
+
+    # Check if the task is running
+    $taskStatus = Get-ScheduledTask -TaskName $taskName | Select-Object -ExpandProperty State
+    if ($taskStatus -eq "Running") {
+        Write-Host "Task '$taskName' is running." -ForegroundColor Green
+    } else {
+        Write-Host "Task '$taskName' is not running." -ForegroundColor Red
+    }
 }
