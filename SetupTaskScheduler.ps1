@@ -44,7 +44,7 @@ if ($DebugFlag) {
 }
 $taskTrigger = New-ScheduledTaskTrigger -AtLogon -User $userDomain
 $taskPrincipal = New-ScheduledTaskPrincipal -UserId $userDomain -LogonType Interactive -RunLevel Highest
-$taskSettings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -RunOnlyIfNetworkAvailable
+$taskSettings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -RunOnlyIfNetworkAvailable -RestartCount 5 -RestartInterval (New-TimeSpan -Minutes 1) -ExecutionTimeLimit ([TimeSpan]::Zero)
 
 # Check if the task already exists
 $taskExists = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
@@ -69,4 +69,12 @@ $runTask = Read-Host "Do you want to run the task now? (Y/N)"
 if ($runTask.ToUpper() -eq "Y") {
     Write-Host "Running task '$taskName'..." -ForegroundColor Cyan
     Start-ScheduledTask -TaskName $taskName
+
+    # Check if the task is running
+    $taskStatus = Get-ScheduledTask -TaskName $taskName | Select-Object -ExpandProperty State
+    if ($taskStatus -eq "Running") {
+        Write-Host "Task '$taskName' is running." -ForegroundColor Green
+    } else {
+        Write-Host "Task '$taskName' is not running." -ForegroundColor Red
+    }
 }

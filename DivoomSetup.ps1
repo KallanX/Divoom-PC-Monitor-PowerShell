@@ -42,6 +42,12 @@ function Get-UserSelection {
 $response = Invoke-RestMethod -Uri "https://app.divoom-gz.com/Device/ReturnSameLANDevice"
 $deviceList = $response.DeviceList
 
+# If the device list is empty, exit the script
+if ($deviceList.Length -eq 0) {
+    Write-Host "No devices found on the network. Please make sure the device is connected to the same network as the PC." -ForegroundColor Red
+    exit
+}
+
 Format-DeviceList -Devices $deviceList
 $selectedDevice = Get-UserSelection -Devices $deviceList
 
