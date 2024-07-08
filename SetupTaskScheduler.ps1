@@ -44,7 +44,7 @@ if ($DebugFlag) {
 }
 $taskTrigger = New-ScheduledTaskTrigger -AtLogon -User $userDomain
 $taskPrincipal = New-ScheduledTaskPrincipal -UserId $userDomain -LogonType Interactive -RunLevel Highest
-$taskSettings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -RunOnlyIfNetworkAvailable
+$taskSettings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -RunOnlyIfNetworkAvailable -RestartCount 5 -RestartInterval (New-TimeSpan -Minutes 1) -ExecutionTimeLimit ([TimeSpan]::Zero)
 
 # Check if the task already exists
 $taskExists = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
