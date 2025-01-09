@@ -69,6 +69,8 @@ $env:DriveLetters = $config['SelectedDriveLetters']
 $dllPath = Join-Path -Path $PSScriptRoot -ChildPath "LibreHardwareMonitorLib.dll"
 Add-Type -Path $dllPath
 
+Unblock-File -Path "LibreHardwareMonitorLib.dll"
+
 $computer = New-Object LibreHardwareMonitor.Hardware.Computer
 $computer.IsCpuEnabled = $TRUE
 
@@ -82,14 +84,19 @@ while ($true) {
 
     foreach ($hardware in $computer.Hardware) {
         if ($hardware.HardwareType -eq [LibreHardwareMonitor.Hardware.HardwareType]::Cpu) {
+            $hardware.Update()
             foreach ($sensor in $hardware.Sensors) {
                 if ($sensor.SensorType -eq [LibreHardwareMonitor.Hardware.SensorType]::Load -and $sensor.Name -eq "CPU Total") {
                     $cpuTotalLoad = $sensor.Value
                     Write-LogMessage "Found CPU total load sensor: $($sensor.Name) with value: $($sensor.Value)"
                 }
-                if ($sensor.SensorType -eq [LibreHardwareMonitor.Hardware.SensorType]::Temperature -and $sensor.Name -eq "CPU Package") {
-                    $cpuPackageTemp = $sensor.Value
-                    Write-LogMessage "Found CPU package temperature sensor: $($sensor.Name) with value: $($sensor.Value)"
+                if ($sensor.SensorType -eq [LibreHardwareMonitor.Hardware.SensorType]::Temperature) {
+                    if ($sensor.Name -eq "CPU Package" -and $sensor.Value -gt 0) {
+                        $cpuPackageTemp = $sensor.Value
+                    } elseif ($cpuPackageTemp -eq 0 -and $sensor.Name -eq "Core (Tctl/Tdie)" -and $sensor.Value -gt 0) {
+                        $cpuPackageTemp = $sensor.Value
+                    }
+                    Write-LogMessage "Found CPU temperature sensor: $($sensor.Name) with value: $($sensor.Value)"
                 }
             }
         }
