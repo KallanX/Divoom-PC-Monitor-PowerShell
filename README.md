@@ -40,6 +40,8 @@ This project is a PowerShell implementation of the Divoom PC Monitor originally 
     ./DivoomSetup.ps1
    ```
 
+   ⚠️ **Attention:** Be sure to set the PC Monitor app to the desired device LCD before running the setup script via the Divoom app. During the setup script, select the LCD with the Device ID of 625.
+
 3. Execute the main script (requires admin privileges):
    ```powershell
    PowerShell.exe -ExecutionPolicy Bypass -File .\DivoomPCMonitor.ps1 -IntervalInSeconds 10 -Verbose
@@ -52,7 +54,7 @@ This project is a PowerShell implementation of the Divoom PC Monitor originally 
 
 ## Configuration
 
-- **DivoomPCMonitor.ps1**: Due to the use of the LibraHardwareMonitorLib.dll, the script requires the admin privileges to run.
+- **DivoomPCMonitor.ps1**: Due to the use of the LibreHardwareMonitorLib.dll, the script requires the admin privileges to run.
 - **DivoomSetup.ps1**: This script creates a configuration file required by the main script.
 - **SetupTaskScheduler.ps1**: This script sets up a scheduled task to run the monitor automatically upon user login. Requires administrative privileges.
 
@@ -60,12 +62,12 @@ This project is a PowerShell implementation of the Divoom PC Monitor originally 
 
 - **Admin Privileges**: `SetupTaskScheduler.ps1` must be run in an admin terminal.
 - **GPU Support**: Currently, GPU data is supported only for NVIDIA GPUs using `nvidia-smi.exe`.
-- **CPU Temperature**: Fixed CPU temperature monitoring by using an external DLL `LibraHardwareMonitorLib.dll`.
+- **CPU Temperature**: Fixed CPU temperature monitoring by using an external DLL `LibreHardwareMonitorLib.dll`.
 - **Third-party Tools**: Unfortunately, this script requires the use of third-party tools to monitor system metrics. These tools are included in the repository for convenience.
 
 ## Shortcomings
 
-- **CPU Temperature**: CPU usage and temperature are now functional due to use of the external DLL `LibraHardwareMonitorLib.dll`.
+- **CPU Temperature**: CPU usage and temperature are now functional due to use of the external DLL `LibreHardwareMonitorLib.dll`.
 - **Drive Letter Display**: Future updates will include displaying the drive letter alongside the HDD usage percentage.
 
 ## Future Improvements
