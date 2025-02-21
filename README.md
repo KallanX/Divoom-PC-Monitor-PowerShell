@@ -61,13 +61,12 @@ This project is a PowerShell implementation of the Divoom PC Monitor originally 
 ## Notes
 
 - **Admin Privileges**: `SetupTaskScheduler.ps1` must be run in an admin terminal.
-- **GPU Support**: Currently, GPU data is supported only for NVIDIA GPUs using `nvidia-smi.exe`.
+- **GPU Support**: Currently, GPU data is supported only for NVIDIA and AMD GPUs using `nvidia-smi.exe` (NVIDIA) and `rocm-smi.exe` (AMD).
 - **CPU Temperature**: Fixed CPU temperature monitoring by using an external DLL `LibreHardwareMonitorLib.dll`.
 - **Third-party Tools**: Unfortunately, this script requires the use of third-party tools to monitor system metrics. These tools are included in the repository for convenience.
 
 ## Shortcomings
 
-- **CPU Temperature**: CPU usage and temperature are now functional due to use of the external DLL `LibreHardwareMonitorLib.dll`.
 - **Drive Letter Display**: Future updates will include displaying the drive letter alongside the HDD usage percentage.
 
 ## Future Improvements
