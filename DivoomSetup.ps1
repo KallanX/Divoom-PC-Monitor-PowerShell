@@ -62,11 +62,11 @@ function Format-LcdList {
         [Array]$Lcds
     )
 
-    $i = 1
+    $i = 0
     foreach ($lcd in $Lcds) {
-        Write-Host "Lcd $($i):" -ForegroundColor Cyan
+        Write-Host "Lcd $($i + 1):" -ForegroundColor Cyan
         Write-Host "------" -ForegroundColor Cyan
-        Write-Output "  Select Index    : $($lcd.LcdSelectIndex)"
+        Write-Output "  Select Index    : $($i)"
         Write-Output "  Clock ID        : $($lcd.LcdClockId)"
         Write-Output "  Image Pixel ID  : $($lcd.ClockImagePixelId)"
         Write-Output "`n"  # New line for better readability

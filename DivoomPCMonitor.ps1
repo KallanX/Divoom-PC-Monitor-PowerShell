@@ -177,8 +177,9 @@ while ($true) {
 
     # Send Select Clock to the Divoom Times Gate device
     $PostInfo = @{
-        LcdIndependence = $env:LcdIndependence
         Command = "Channel/SetClockSelectId"
+        LcdIndependence = $env:LcdIndependence
+        DeviceId = $env:DeviceID
         LcdIndex = $env:LcdIndex
         ClockId = $env:LcdClockId
     }
@@ -196,7 +197,7 @@ while ($true) {
         Command = "Device/UpdatePCParaInfo"
         ScreenList = @(
             @{
-                LcdId = $env:LcdIndex
+                LcdId = [int]$env:LcdIndex
                 DispData = @(
                     "$($systemInfo.CPU_Usage_Percentage)",
                     "$($systemInfo.GPU_Usage)",
