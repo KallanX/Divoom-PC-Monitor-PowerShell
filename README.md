@@ -12,8 +12,8 @@ This project is a PowerShell implementation of the Divoom PC Monitor originally 
   - CPU usage percentage
   - CPU temperature
   - RAM usage
-  - GPU usage (NVIDIA only)
-  - GPU temperature (NVIDIA only)
+  - GPU usage (NVIDIA & AMD)
+  - GPU temperature (NVIDIA & AMD)
   - HDD usage (dynamic drive selection based on highest usage)
 - **Easy Setup**: Configuration script simplifies the setup process.
 - **Scheduled Task Support**: Users can set up a scheduled task to run the monitor automatically upon login.
