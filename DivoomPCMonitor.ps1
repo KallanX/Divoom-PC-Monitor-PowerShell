@@ -112,13 +112,33 @@ while ($true) {
     $mem = Get-WmiObject -Class Win32_OperatingSystem
     $ramUsagePercentage = [math]::Round(($mem.TotalVisibleMemorySize - $mem.FreePhysicalMemory) / $mem.TotalVisibleMemorySize * 100)
 
-    # Run the nvidia-smi command and get the output
-    $gpuInfo = & 'C:\Windows\System32\nvidia-smi.exe' --query-gpu=utilization.gpu,temperature.gpu --format=csv,noheader,nounits
-
-    # Split the data line into individual values
-    $dataValues = $gpuInfo -split ','
-    $gpuUsage = $dataValues[0].Trim()
-    $gpuTemp = [math]::Round($dataValues[1].Trim())
+    # Determine the GPU vendor and get the GPU usage and temperature
+    $detectedGPU = Get-CimInstance -ClassName Win32_VideoController
+    if ($detectedGPU.Name -like "*NVIDIA*") {
+        Write-LogMessage "Detected NVIDIA GPU: $($detectedGPU.Name)"
+        $gpuInfo = & 'C:\Windows\System32\nvidia-smi.exe' --query-gpu=utilization.gpu,temperature.gpu --format=csv,noheader,nounits
+        # Split the data line into individual values
+        $dataValues = $gpuInfo -split ','
+        $gpuUsage = $dataValues[0].Trim()
+        $gpuTemp = [math]::Round($dataValues[1].Trim())
+    } elseif ($detectedGPU.Name -like "*AMD*") {
+        Write-LogMessage "Detected AMD GPU: $($detectedGPU.Name)"
+        $gpuInfo = & 'C:\Windows\System32\rocm-smi.exe' --showuse --showtemp --json
+        $gpuInfo = $gpuInfo | ConvertFrom-Json
+        $gpuUsage = $gpuInfo.card0."GPU use (%)"
+        $gpuUsage = [math]::Round([float]$gpuUsage)
+        $gpuTemp = $gpuInfo.card0."Temperature (Sensor edge) (C)"
+        $gpuTemp = [math]::Round([float]$gpuTemp)
+    } elseif ($detectedGPU.Name -like "*Intel*") {
+        Write-LogMessage "Detected Intel GPU: $($detectedGPU.Name)"
+        $gpuInfo = & 'C:\Windows\System32\intelcvc.exe' --query=GPUUtilization,Temp --format=csv,noheader,nounits
+        $gpuUsage = "IXE"
+        $gpuTemp = "IXE"
+    } else {
+        Write-LogMessage "Detected GPU: $($detectedGPU.Name)"
+        $gpuUsage = "N/A"
+        $gpuTemp = "N/A"
+    }
 
     # Initialize an array to hold the drive usage information
     $driveUsageAll = @()
