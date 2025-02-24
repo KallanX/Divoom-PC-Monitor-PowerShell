@@ -195,23 +195,6 @@ while ($true) {
     # Send the system information to the Divoom Times Gate device
     Write-LogMessage "Sending system information to the Divoom Times Gate device..."
 
-    # Send Select Clock to the Divoom Times Gate device
-    $PostInfo = @{
-        Command = "Channel/SetClockSelectId"
-        LcdIndependence = $env:LcdIndependence
-        DeviceId = $env:DeviceID
-        LcdIndex = $env:LcdIndex
-        ClockId = $env:LcdClockId
-    }
-    $ParamInfo = $PostInfo | ConvertTo-Json
-
-    Write-LogMessage "Select Clock Data to be sent: $ParamInfo"
-
-    # Send the HTTP POST request
-    $ResponseInfo = Invoke-RestMethod -Uri "http://$($env:DeviceIP):80/post" -Method Post -Body $ParamInfo -ContentType "application/json"
-
-    Write-LogMessage "Select Clock Response: $ResponseInfo"
-
     # Define the Divoom device post structure
     $PostInfo = @{
         Command = "Device/UpdatePCParaInfo"
@@ -239,6 +222,13 @@ while ($true) {
     $ResponseInfo = Invoke-RestMethod -Uri "http://$($env:DeviceIP):80/post" -Method Post -Body $ParamInfo -ContentType "application/json"
 
     Write-LogMessage "System Information Response: $ResponseInfo"
+
+    # If responseinfo text is {"error_code": 0}, the command was successful
+    if ($ResponseInfo -eq '{"error_code": 0}') {
+        Write-Host "HTTP Post - OKAY!" -ForegroundColor Green
+    } else {
+        Write-Host "HTTP Post - ERROR!" -ForegroundColor Red
+    }
     
     # Wait for the specified interval
     Write-LogMessage "System information updated. Waiting for $IntervalInSeconds seconds..."

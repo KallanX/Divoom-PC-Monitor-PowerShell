@@ -69,7 +69,10 @@ function Format-LcdList {
         Write-Output "  Select Index    : $($i)"
         Write-Output "  Clock ID        : $($lcd.LcdClockId)"
         Write-Output "  Image Pixel ID  : $($lcd.ClockImagePixelId)"
-        Write-Output "`n"  # New line for better readability
+        if ($lcd.LcdClockId -eq 625) {
+            Write-Output "  Description     : Divoom PC Monitor"
+        }
+        Write-Output "`n"
         $i++
     }
 }
@@ -134,3 +137,29 @@ try {
 }
 
 Write-Host "Config file created successfully." -ForegroundColor Green
+
+Write-Host "Sending configuration to the device..." -ForegroundColor Cyan
+
+# Send Select Clock to the Divoom Times Gate device
+$PostInfo = @{
+    Command = "Channel/SetClockSelectId"
+    LcdIndependence = $LcdIndependence
+    DeviceId = $DeviceID
+    LcdIndex = $LcdIndex
+    ClockId = $LcdClockId
+}
+$ParamInfo = $PostInfo | ConvertTo-Json
+
+Write-LogMessage "Select Clock Data to be sent: $ParamInfo"
+
+# Send the HTTP POST request
+$ResponseInfo = Invoke-RestMethod -Uri "http://$($env:DeviceIP):80/post" -Method Post -Body $ParamInfo -ContentType "application/json"
+
+Write-LogMessage "Select Clock Response: $ResponseInfo"
+
+# If responseinfo text is {"error_code": 0}, the command was successful
+if ($ResponseInfo -eq '{"error_code": 0}') {
+    Write-Host "HTTP Post - OKAY!" -ForegroundColor Green
+} else {
+    Write-Host "HTTP Post - ERROR!" -ForegroundColor Red
+}

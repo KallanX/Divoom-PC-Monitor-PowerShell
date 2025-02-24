@@ -40,7 +40,7 @@ This project is a PowerShell implementation of the Divoom PC Monitor originally 
     ./DivoomSetup.ps1
    ```
 
-   ⚠️ **Attention:** Be sure to set the PC Monitor app to the desired device LCD before running the setup script via the Divoom app. During the setup script, select the LCD with the Device ID of 625.
+   ⚠️ **Attention:** If the PC Monitor app (625) is currently displayed on a 'LCD face', the setup output will include 'Divoom PC Monitor'. This message doesn't restrict which 'LCD face' you can ultimately use; the app can be assigned to any face regardless of its initial state.
 
 3. Execute the main script (requires admin privileges):
    ```powershell
