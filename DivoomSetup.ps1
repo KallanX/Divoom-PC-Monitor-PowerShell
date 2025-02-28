@@ -35,7 +35,7 @@ function Get-UserSelection {
         }
     } until ($isValid)
 
-    Write-Host "\n------------------------------\n"
+    Write-Host "`n------------------------------`n"
 
     return $Devices[$selection - 1]
 }
@@ -104,7 +104,7 @@ if ($lcdIndependenceList.Count -gt 1) {
         }
     } until ($selectionIsValid)
 
-    Write-Host "\n------------------------------\n"
+    Write-Host "`n------------------------------`n"
 
     $selectedIndependence = $lcdIndependenceList[$selection - 1]
 } else {
