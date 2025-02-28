@@ -117,6 +117,14 @@ Format-LcdList -Lcds $lcdList
 
 $selectedLcd = Get-UserSelection -Devices $lcdList
 
+# Print out the selected LCD information
+Write-Host "Selected LCD Information:" -ForegroundColor Cyan
+Write-Host "-------------------------" -ForegroundColor Cyan
+Write-Output "  Array Index     : $($selectedLcd.LcdIndex)"
+Write-Output "  Clock ID        : $($selectedLcd.LcdClockId)"
+Write-Output "  Image Pixel ID  : $($selectedLcd.ClockImagePixelId)"
+Write-Output "`n"
+
 # Save the selected Index and Clock ID to the .env file
 $LcdIndex = $($selectedLcd.LcdIndex)
 $LcdClockId = $($selectedLcd.LcdClockId)
