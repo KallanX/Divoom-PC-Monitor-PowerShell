@@ -37,7 +37,7 @@ function Get-UserSelection {
 
     Write-Host "`n------------------------------`n"
 
-    return $Devices[$selection - 1]
+    return $Devices[$selection - 1], $selection - 1
 }
 
 # Get device list from the network
@@ -115,7 +115,7 @@ if ($lcdIndependenceList.Count -gt 1) {
 $lcdList = $selectedIndependence.LcdList
 Format-LcdList -Lcds $lcdList
 
-$selectedLcd = Get-UserSelection -Devices $lcdList
+$selectedLcd, $arrayIndex = Get-UserSelection -Devices $lcdList
 
 # Print out the selected LCD
 Write-Host "Selected LCD: $($selectedLcd)"
@@ -123,13 +123,13 @@ Write-Host "Selected LCD: $($selectedLcd)"
 # Print out the selected LCD information
 Write-Host "Selected LCD Information:" -ForegroundColor Cyan
 Write-Host "-------------------------" -ForegroundColor Cyan
-Write-Output "  Array Index     : $([int]$selectedLcd)"
+Write-Output "  Array Index     : $($arrayIndex)"
 Write-Output "  Clock ID        : $($selectedLcd.LcdClockId)"
 Write-Output "  Image Pixel ID  : $($selectedLcd.ClockImagePixelId)"
 Write-Output "`n"
 
 # Save the selected Index and Clock ID to the .env file
-$LcdIndex = $($selectedLcd.LcdIndex)
+$LcdIndex = $($arrayIndex)
 $LcdClockId = $($selectedLcd.LcdClockId)
 
 # Print out LCD Index and Clock ID
