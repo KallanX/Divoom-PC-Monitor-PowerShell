@@ -118,7 +118,7 @@ Format-LcdList -Lcds $lcdList
 $selectedLcd = Get-UserSelection -Devices $lcdList
 
 # Save the selected Index and Clock ID to the .env file
-$LcdIndex = $($selectedLcd.LcdSelectIndex)
+$LcdIndex = $($selectedLcd.LcdIndex)
 $LcdClockId = $($selectedLcd.LcdClockId)
 
 # Print out LCD Index and Clock ID
