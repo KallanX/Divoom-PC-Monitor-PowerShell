@@ -5,6 +5,8 @@ function Format-DeviceList {
         [Array]$Devices
     )
 
+    Write-Host
+
     $i = 1
     foreach ($device in $Devices) {
         Write-Host "Device $($i):" -ForegroundColor Cyan
@@ -34,6 +36,8 @@ function Get-UserSelection {
             Write-Output "Invalid selection. Please enter a number between 1 and $deviceCount."
         }
     } until ($isValid)
+
+    Write-Host "------------------------------"
     
     return $Devices[$selection - 1]
 }
@@ -66,7 +70,7 @@ function Format-LcdList {
     foreach ($lcd in $Lcds) {
         Write-Host "Lcd $($i + 1):" -ForegroundColor Cyan
         Write-Host "------" -ForegroundColor Cyan
-        Write-Output "  Select Index    : $($i)"
+        Write-Output "  Array Index    : $($i)"
         Write-Output "  Clock ID        : $($lcd.LcdClockId)"
         Write-Output "  Image Pixel ID  : $($lcd.ClockImagePixelId)"
         if ($lcd.LcdClockId -eq 625) {
@@ -87,10 +91,11 @@ if ($null -eq $lcdIndependenceList -or $lcdIndependenceList.Count -eq 0) {
 
 # Select LCD Independence
 if ($lcdIndependenceList.Count -gt 1) {
+    Write-Host
     Write-Host "Multiple LCD Groups (Independence) found. Please select one:" -ForegroundColor Cyan
     $i = 1
     foreach ($independence in $lcdIndependenceList) {
-        Write-Host "LCD Independence $($i): $($independence.LcdIndependence)" -ForegroundColor Cyan
+        Write-Host "LCD Independence $($i): $($independence.LcdIndependence)"
         $i++
     }
 
