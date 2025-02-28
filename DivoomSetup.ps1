@@ -78,11 +78,15 @@ function Format-LcdList {
 }
 
 $response = Invoke-RestMethod -Uri "https://app.divoom-gz.com/Channel/Get5LcdInfoV2?DeviceType=LCD&DeviceId=$($DeviceID)"
-$lcdIndependence = $response.LcdIndependence
 $lcdIndependenceList = $response.LcdIndependenceList
 
-# If the LCD Independence list is greater than 1, prompt the user to select an LCD Independence
-if ($lcdIndependenceList.Length -gt 1) {
+if ($null -eq $lcdIndependenceList -or $lcdIndependenceList.Count -eq 0) {
+    Write-Host "No LCD Independence List found." -ForegroundColor Red
+    return
+}
+
+# Select LCD Independence
+if ($lcdIndependenceList.Count -gt 1) {
     Write-Host "Multiple LCD Groups (Independence) found. Please select one:" -ForegroundColor Cyan
     $i = 1
     foreach ($independence in $lcdIndependenceList) {
@@ -90,12 +94,21 @@ if ($lcdIndependenceList.Length -gt 1) {
         $i++
     }
 
-    $selection = Read-Host "Please enter the LCD Independence number"
-    $lcdIndependence = $lcdIndependenceList[$selection - 1].LcdIndependence
+    do {
+        $selection = Read-Host "Please enter the LCD Independence number"
+        $selectionIsValid = [int]::TryParse($selection, [ref]$selection) -and ($selection -ge 1) -and ($selection -le $lcdIndependenceList.Count)
+        if (-not $selectionIsValid) {
+            Write-Host "Invalid selection. Please enter a number between 1 and $($lcdIndependenceList.Count)." -ForegroundColor Red
+        }
+    } until ($selectionIsValid)
+
+    $selectedIndependence = $lcdIndependenceList[$selection - 1]
+} else {
+    $selectedIndependence = $lcdIndependenceList[0]
 }
 
-# Use the selected LCD Independence to get the LCD list
-$lcdList = $response.LcdList | Where-Object { $_.LcdIndependence -eq $lcdIndependence }
+# Get the LcdList *from the selected independence object*
+$lcdList = $selectedIndependence.LcdList
 Format-LcdList -Lcds $lcdList
 
 $selectedLcd = Get-UserSelection -Devices $lcdList
