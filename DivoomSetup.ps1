@@ -94,7 +94,8 @@ if ($lcdIndependenceList.Length -gt 1) {
     $lcdIndependence = $lcdIndependenceList[$selection - 1].LcdIndependence
 }
 
-$lcdList = $lcdIndependence.LcdList
+# Use the selected LCD Independence to get the LCD list
+$lcdList = $response.LcdList | Where-Object { $_.LcdIndependence -eq $lcdIndependence }
 Format-LcdList -Lcds $lcdList
 
 $selectedLcd = Get-UserSelection -Devices $lcdList
