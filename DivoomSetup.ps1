@@ -121,6 +121,10 @@ $selectedLcd = Get-UserSelection -Devices $lcdList
 $LcdIndex = $($selectedLcd.LcdSelectIndex)
 $LcdClockId = $($selectedLcd.LcdClockId)
 
+# Print out LCD Index and Clock ID
+Write-Host "Selected LCD Index: $LcdIndex" -ForegroundColor Cyan
+Write-Host "Selected Clock ID: $LcdClockId" -ForegroundColor Cyan
+
 # Function to get all drive letters on the PC
 function Get-DriveLetters {
     $drives = Get-WmiObject -Class Win32_LogicalDisk | Select-Object -ExpandProperty DeviceID
