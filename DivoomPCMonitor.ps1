@@ -73,6 +73,7 @@ Unblock-File -Path "LibreHardwareMonitorLib.dll"
 
 $computer = New-Object LibreHardwareMonitor.Hardware.Computer
 $computer.IsCpuEnabled = $TRUE
+$computer.IsGpuEnabled = $TRUE
 
 while ($true) {
     # Get the system information
@@ -102,8 +103,6 @@ while ($true) {
         }
     }
 
-    $computer.Close()
-
     # Round the values
     $cpuTotalLoad = [math]::Round($cpuTotalLoad)
     $cpuPackageTemp = [math]::Round($cpuPackageTemp)
@@ -123,12 +122,23 @@ while ($true) {
         $gpuTemp = [math]::Round($dataValues[1].Trim())
     } elseif ($detectedGPU.Name -like "*AMD*") {
         Write-LogMessage "Detected AMD GPU: $($detectedGPU.Name)"
-        $gpuInfo = & 'C:\Windows\System32\rocm-smi.exe' --showuse --showtemp --json
-        $gpuInfo = $gpuInfo | ConvertFrom-Json
-        $gpuUsage = $gpuInfo.card0."GPU use (%)"
-        $gpuUsage = [math]::Round([float]$gpuUsage)
-        $gpuTemp = $gpuInfo.card0."Temperature (Sensor edge) (C)"
-        $gpuTemp = [math]::Round([float]$gpuTemp)
+        # Find the AMD GPU
+        $gpu = $computer.Hardware | Where-Object { $_.HardwareType -eq "GpuAmd" }
+        $gpu.Update()
+
+        # Initialize variables
+        $gpuUsage = $null
+        $gpuTemp = $null
+
+        # Get GPU Temperature & Load
+        $gpu.Sensors | ForEach-Object {
+            if ($_.SensorType -eq "Temperature" -and $_.Name -like "*Core*") {
+                $gpuTemp = [math]::Round([float]$_.Value)
+            }
+            elseif ($_.SensorType -eq "Load" -and $_.Name -like "*GPU Core*") {
+                $gpuUsage = [math]::Round([float]$_.Value)
+            }
+        }
     } elseif ($detectedGPU.Name -like "*Intel*") {
         Write-LogMessage "Detected Intel GPU: $($detectedGPU.Name)"
         $gpuInfo = & 'C:\Windows\System32\intelcvc.exe' --query=GPUUtilization,Temp --format=csv,noheader,nounits
@@ -139,6 +149,8 @@ while ($true) {
         $gpuUsage = "N/A"
         $gpuTemp = "N/A"
     }
+
+    $computer.Close()
 
     # Initialize an array to hold the drive usage information
     $driveUsageAll = @()
@@ -224,7 +236,7 @@ while ($true) {
     Write-LogMessage "System Information Response: $ResponseInfo"
 
     # If responseinfo text is {"error_code": 0}, the command was successful
-    if ($ResponseInfo -eq '{"error_code": 0}') {
+    if ($ResponseInfo.error_code -eq 0) {
         Write-Host "HTTP Post - OKAY!" -ForegroundColor Green
     } else {
         Write-Host "HTTP Post - ERROR!" -ForegroundColor Red
