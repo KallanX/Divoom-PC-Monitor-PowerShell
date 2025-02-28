@@ -40,27 +40,6 @@ function Get-UserSelection {
     return $Devices[$selection - 1]
 }
 
-# Function to get LCD selection from a list of LCDs
-function Get-LCDSelection {
-    param (
-        [Parameter(Mandatory=$true)]
-        [Array]$Lcds
-    )
-
-    $lcdCount = $Lcds.Length
-    do {
-        $selection = Read-Host "Please select an LCD number"
-        $isValid = $selection -as [int] -and $selection -ge 0 -and $selection -lt $lcdCount
-        if (-not $isValid) {
-            Write-Output "Invalid selection. Please enter a number between 0 and $($lcdCount - 1)."
-        }
-    } until ($isValid)
-
-    Write-Host "`n------------------------------`n"
-
-    return $Lcds[$selection]
-}
-
 # Get device list from the network
 $response = Invoke-RestMethod -Uri "https://app.divoom-gz.com/Device/ReturnSameLANDevice"
 $deviceList = $response.DeviceList
@@ -136,7 +115,7 @@ if ($lcdIndependenceList.Count -gt 1) {
 $lcdList = $selectedIndependence.LcdList
 Format-LcdList -Lcds $lcdList
 
-$selectedLcd = Get-LCDSelection -Lcds $lcdList
+$selectedLcd = Get-UserSelection -Devices $lcdList
 
 # Print out the selected LCD
 Write-Host "Selected LCD: $($selectedLcd)"
@@ -144,7 +123,7 @@ Write-Host "Selected LCD: $($selectedLcd)"
 # Print out the selected LCD information
 Write-Host "Selected LCD Information:" -ForegroundColor Cyan
 Write-Host "-------------------------" -ForegroundColor Cyan
-Write-Output "  Array Index     : $($selectedLcd.LcdIndex)"
+Write-Output "  Array Index     : $($selectedLcd)"
 Write-Output "  Clock ID        : $($selectedLcd.LcdClockId)"
 Write-Output "  Image Pixel ID  : $($selectedLcd.ClockImagePixelId)"
 Write-Output "`n"
