@@ -51,7 +51,7 @@ if ($deviceList.Length -eq 0) {
 }
 
 Format-DeviceList -Devices $deviceList
-$selectedDevice = Get-UserSelection -Devices $deviceList
+$selectedDevice, $arrayIndex = Get-UserSelection -Devices $deviceList
 
 # Save the selected device ID and IP address to the .env file
 $DeviceID = $($selectedDevice.DeviceId)
