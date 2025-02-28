@@ -37,7 +37,7 @@ function Get-UserSelection {
 
     Write-Host "`n------------------------------`n"
 
-    return $Devices[$selection - 1], $selection - 1
+    return $Devices[$selection - 1], $($selection - 1)
 }
 
 # Get device list from the network
