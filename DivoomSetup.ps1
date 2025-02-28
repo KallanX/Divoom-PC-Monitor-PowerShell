@@ -81,10 +81,21 @@ $response = Invoke-RestMethod -Uri "https://app.divoom-gz.com/Channel/Get5LcdInf
 $lcdIndependence = $response.LcdIndependence
 $lcdIndependenceList = $response.LcdIndependenceList
 
-foreach ($independence in $lcdIndependenceList) {
-    $lcdList = $independence.LcdList
-    Format-LcdList -Lcds $lcdList
+# If the LCD Independence list is greater than 1, prompt the user to select an LCD Independence
+if ($lcdIndependenceList.Length -gt 1) {
+    Write-Host "Multiple LCD Groups (Independence) found. Please select one:" -ForegroundColor Cyan
+    $i = 1
+    foreach ($independence in $lcdIndependenceList) {
+        Write-Host "LCD Independence $($i): $($independence.LcdIndependence)" -ForegroundColor Cyan
+        $i++
+    }
+
+    $selection = Read-Host "Please enter the LCD Independence number"
+    $lcdIndependence = $lcdIndependenceList[$selection - 1].LcdIndependence
 }
+
+$lcdList = $lcdIndependence.LcdList
+Format-LcdList -Lcds $lcdList
 
 $selectedLcd = Get-UserSelection -Devices $lcdList
 
@@ -146,7 +157,7 @@ $PostInfo = @{
     LcdIndependence = $LcdIndependence
     DeviceId = $DeviceID
     LcdIndex = $LcdIndex
-    ClockId = $LcdClockId
+    ClockId = 625
 }
 $ParamInfo = $PostInfo | ConvertTo-Json
 
