@@ -117,6 +117,9 @@ Format-LcdList -Lcds $lcdList
 
 $selectedLcd = Get-UserSelection -Devices $lcdList
 
+# Print out the selected LCD
+Write-Host "Selected LCD: $($selectedLcd)"
+
 # Print out the selected LCD information
 Write-Host "Selected LCD Information:" -ForegroundColor Cyan
 Write-Host "-------------------------" -ForegroundColor Cyan
