@@ -168,7 +168,7 @@ Write-Host "Sending configuration to the device..." -ForegroundColor Cyan
 # Send Select Clock to the Divoom Times Gate device
 $PostInfo = @{
     Command = "Channel/SetClockSelectId"
-    LcdIndependence = $LcdIndependence
+    LcdIndependence = $selectedIndependence.LcdIndependence
     DeviceId = $DeviceID
     LcdIndex = $LcdIndex
     ClockId = 625
