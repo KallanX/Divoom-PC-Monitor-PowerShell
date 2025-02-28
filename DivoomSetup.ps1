@@ -123,7 +123,7 @@ Write-Host "Selected LCD: $($selectedLcd)"
 # Print out the selected LCD information
 Write-Host "Selected LCD Information:" -ForegroundColor Cyan
 Write-Host "-------------------------" -ForegroundColor Cyan
-Write-Output "  Array Index     : $($selectedLcd)"
+Write-Output "  Array Index     : $([int]$selectedLcd)"
 Write-Output "  Clock ID        : $($selectedLcd.LcdClockId)"
 Write-Output "  Image Pixel ID  : $($selectedLcd.ClockImagePixelId)"
 Write-Output "`n"
