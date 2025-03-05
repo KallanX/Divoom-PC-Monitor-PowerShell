@@ -85,6 +85,28 @@ while ($true) {
     $isAmd = $false
     $isIntel = $false
 
+    $Computer.Accept(New-Object LibreHardwareMonitor.Hardware.UpdateVisitor)
+
+    $cpuTemperatureSensors = foreach ($hardware in $Computer.Hardware) {
+        # Check if the hardware is a CPU.
+        if ($hardware.HardwareType -eq [LibreHardwareMonitor.Hardware.HardwareType]::Cpu) {
+            foreach ($sensor in $hardware.Sensors) {
+                if ($sensor.SensorType -eq [LibreHardwareMonitor.Hardware.SensorType]::Temperature) {
+                    [PSCustomObject]@{
+                        Name       = $sensor.Name
+                        Identifier = $sensor.Identifier
+                        Value      = $sensor.Value
+                        Hardware   = $hardware.Name
+                        HardwareType = $hardware.HardwareType
+                    }
+                }
+            }
+        }
+    }
+
+    # Display the list of CPU temperature sensors.
+    $cpuTemperatureSensors | Format-Table -AutoSize
+
     # Determine if the CPU is Intel or AMD (Improved method)
     try {
         $cpu = $computer.Hardware | Where-Object { $_.HardwareType -eq "Cpu" }
