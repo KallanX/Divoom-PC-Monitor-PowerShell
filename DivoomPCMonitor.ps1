@@ -85,9 +85,7 @@ while ($true) {
     $isAmd = $false
     $isIntel = $false
 
-    $Computer.Accept(New-Object LibreHardwareMonitor.Hardware.UpdateVisitor)
-
-    $cpuTemperatureSensors = foreach ($hardware in $Computer.Hardware) {
+    $cpuTemperatureSensors = foreach ($hardware in $computer.Hardware) {
         # Check if the hardware is a CPU.
         if ($hardware.HardwareType -eq [LibreHardwareMonitor.Hardware.HardwareType]::Cpu) {
             foreach ($sensor in $hardware.Sensors) {
