@@ -112,10 +112,10 @@ while ($true) {
             $cpu.Update() # Update is needed here.
             if($cpu.Name -like "*AMD*") {
                 $isAmd = $true
-                Write-LogMessage "Detected AMD CPU"
+                Write-LogMessage "Detected AMD CPU - $($cpu.Name)"
             } elseif ($cpu.Name -like "*Intel*") {
                 $isIntel = $true
-                Write-LogMessage "Detected Intel CPU"
+                Write-LogMessage "Detected Intel CPU - $($cpu.Name)"
             } else {
                 Write-LogMessage "Could not determine CPU manufacturer."
             }
@@ -135,39 +135,12 @@ while ($true) {
                     Write-LogMessage "Found CPU total load sensor: $($sensor.Name) with value: $($sensor.Value)"
                 }
                 if ($sensor.SensorType -eq [LibreHardwareMonitor.Hardware.SensorType]::Temperature) {
-                    # AMD Temperature Logic
-                    if ($isAmd) {
-                        if ($sensor.Name -eq "Tdie" -and $sensor.Value -gt 0) {
-                            $cpuPackageTemp = $sensor.Value
-                            Write-LogMessage "Found AMD CPU temperature sensor (Tdie): $($sensor.Name) with value: $($sensor.Value)"
-                            break # Exit the inner loop
-                        } elseif ($sensor.Name -eq "Core (Tctl/Tdie)" -and $sensor.Value -gt 0) {
-                            $cpuPackageTemp = $sensor.Value
-                            Write-LogMessage "Found AMD CPU temperature sensor (Core (Tctl/Tdie)): $($sensor.Name) with value: $($sensor.Value)"
-                            break
-                        } elseif ($sensor.Name -eq "CPU Package" -and $sensor.Value -gt 0) {  #Fall back.
-                            $cpuPackageTemp = $sensor.Value
-                            Write-LogMessage "Found AMD CPU temperature sensor (CPU Package): $($sensor.Name) with value: $($sensor.Value)"
-                            break #Exit inner loop.
-                        }
-                        #Optionally include individual core temps, this is more verbose.
-                        elseif ($sensor.Name -like "Core #*" -and $sensor.Value -gt 0){
-                            Write-LogMessage "Found AMD CPU temperature sensor ($($sensor.Name)): $($sensor.Name) with value: $($sensor.Value)"
-                        }
-
-                    # Intel Temperature Logic
-                    } elseif ($isIntel) {
-                        if ($sensor.Name -eq "CPU Package" -and $sensor.Value -gt 0) {
-                            $cpuPackageTemp = $sensor.Value
-                            Write-LogMessage "Found Intel CPU temperature sensor (CPU Package): $($sensor.Name) with value: $($sensor.Value)"
-                            break  # Important: Exit the inner loop once a valid temp is found
-                        }
-                        #Optionally include individual core temps, this is more verbose.
-                        elseif ($sensor.Name -like "Core #*" -and $sensor.Value -gt 0){
-                            Write-LogMessage "Found Intel CPU temperature sensor ($($sensor.Name)): $($sensor.Name) with value: $($sensor.Value)"
-                        }
-                    } else {
-                        Write-LogMessage "Could not determine CPU temperature sensor."
+                    if ($isIntel -and $sensor.Name -eq "CPU Package") {
+                        $cpuPackageTemp = $sensor.Value
+                        Write-LogMessage "Found Intel Package temperature sensor: $($sensor.Name) with value: $($sensor.Value)"
+                    } elseif ($isAmd -and $sensor.Name -eq "Core (Tctl/Tdie)") {
+                        $cpuPackageTemp = $sensor.Value
+                        Write-LogMessage "Found AMD Core (Tctl/Tdie) temperature sensor: $($sensor.Name) with value: $($sensor.Value)"
                     }
                 }
             }
