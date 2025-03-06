@@ -112,10 +112,10 @@ while ($true) {
             $cpu.Update() # Update is needed here.
             if($cpu.Name -like "*AMD*") {
                 $isAmd = $true
-                Write-LogMessage "Detected AMD CPU - $($cpu.Name)"
+                Write-LogMessage "Detected AMD CPU: $($cpu.Name)"
             } elseif ($cpu.Name -like "*Intel*") {
                 $isIntel = $true
-                Write-LogMessage "Detected Intel CPU - $($cpu.Name)"
+                Write-LogMessage "Detected Intel CPU: $($cpu.Name)"
             } else {
                 Write-LogMessage "Could not determine CPU manufacturer."
             }
