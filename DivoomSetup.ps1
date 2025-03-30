@@ -84,6 +84,8 @@ $lcdIndependenceList = $response.LcdIndependenceList
 
 if ($null -eq $lcdIndependenceList -or $lcdIndependenceList.Count -eq 0) {
     # If no LCD independence list is found, return None
+    Write-Host "No LCD Independence found. Assuming Pixoo64 or similar device." -ForegroundColor Yellow
+    Write-Host "Setting LCD Independence to None." -ForegroundColor Yellow
     $lcdIndependence = "None"
 }
 
@@ -112,7 +114,9 @@ if ($lcdIndependenceList.Count -gt 1) {
 }
 
 if $lcdIndependence -eq "None" {
+    Write-Host "Setting LCD Index to 0." -ForegroundColor Yellow
     $LcdIndex = "0"
+    Write-Host "Setting LCD Clock ID to None." -ForegroundColor Yellow
     $LcdClockId = "None"
 } else {
     # Get the LcdList *from the selected independence object*
