@@ -1,10 +1,10 @@
 # Divoom PC Monitor - PowerShell Implementation
 
-This repository contains a PowerShell script that interfaces with the Divoom PC Monitor application on the Divoom Times Gate to monitor system information.
+This repository contains a PowerShell script that interfaces with the Divoom PC Monitor application on the Divoom Times Gate and Pixoo64 to monitor system information.
 
 ## Overview
 
-This project is a PowerShell implementation of the Divoom PC Monitor originally written in C# by DivoomDevelop. It allows users to monitor various system metrics and display them on their Divoom Times Gate.
+This project is a PowerShell implementation of the Divoom PC Monitor originally written in C# by DivoomDevelop. It allows users to monitor various system metrics and display them on their Divoom Times Gate or the Divoom Pixoo64.
 
 ## Features
 
