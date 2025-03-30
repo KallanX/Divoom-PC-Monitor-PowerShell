@@ -83,8 +83,8 @@ $response = Invoke-RestMethod -Uri "https://app.divoom-gz.com/Channel/Get5LcdInf
 $lcdIndependenceList = $response.LcdIndependenceList
 
 if ($null -eq $lcdIndependenceList -or $lcdIndependenceList.Count -eq 0) {
-    Write-Host "No LCD Independence List found." -ForegroundColor Red
-    return
+    # If no LCD independence list is found, return None
+    $lcdIndependence = "None"
 }
 
 # Select LCD Independence
@@ -111,15 +111,20 @@ if ($lcdIndependenceList.Count -gt 1) {
     $selectedIndependence = $lcdIndependenceList[0]
 }
 
-# Get the LcdList *from the selected independence object*
-$lcdList = $selectedIndependence.LcdList
-Format-LcdList -Lcds $lcdList
+if $lcdIndependence -eq "None" {
+    $LcdIndex = "0"
+    $LcdClockId = "None"
+} else {
+    # Get the LcdList *from the selected independence object*
+    $lcdList = $selectedIndependence.LcdList
+    Format-LcdList -Lcds $lcdList
 
-$selectedLcd, $arrayIndex = Get-UserSelection -Devices $lcdList
+    $selectedLcd, $arrayIndex = Get-UserSelection -Devices $lcdList
 
-# Save the selected Index and Clock ID to the .env file
-$LcdIndex = $($arrayIndex)
-$LcdClockId = $($selectedLcd.LcdClockId)
+    # Save the selected Index and Clock ID to the .env file
+    $LcdIndex = $($arrayIndex)
+    $LcdClockId = $($selectedLcd.LcdClockId)
+}
 
 # Function to get all drive letters on the PC
 function Get-DriveLetters {
