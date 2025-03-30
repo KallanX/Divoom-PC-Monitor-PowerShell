@@ -85,8 +85,8 @@ $lcdIndependenceList = $response.LcdIndependenceList
 if ($null -eq $lcdIndependenceList -or $lcdIndependenceList.Count -eq 0) {
     # If no LCD independence list is found, return None
     Write-Host "No LCD Independence found. Assuming Pixoo64 or similar device." -ForegroundColor Yellow
-    Write-Host "Setting LCD Independence to None." -ForegroundColor Yellow
-    $lcdIndependence = "None"
+    Write-Host "Setting LCD Independence to 0." -ForegroundColor Yellow
+    $lcdIndependence = 0
 }
 
 # Select LCD Independence
@@ -113,11 +113,11 @@ if ($lcdIndependenceList.Count -gt 1) {
     $selectedIndependence = $lcdIndependenceList[0]
 }
 
-if $lcdIndependence -eq "None" {
+if $lcdIndependence -eq 0 {
     Write-Host "Setting LCD Index to 0." -ForegroundColor Yellow
-    $LcdIndex = "0"
-    Write-Host "Setting LCD Clock ID to None." -ForegroundColor Yellow
-    $LcdClockId = "None"
+    $LcdIndex = 0
+    Write-Host "Setting LCD Clock ID to 625." -ForegroundColor Yellow
+    $LcdClockId = 625
 } else {
     # Get the LcdList *from the selected independence object*
     $lcdList = $selectedIndependence.LcdList
@@ -181,7 +181,7 @@ Write-Host "Sending configuration to the device..." -ForegroundColor Cyan
 # Send Select Clock to the Divoom Times Gate device
 $PostInfo = @{
     Command = "Channel/SetClockSelectId"
-    LcdIndependence = $selectedIndependence.LcdIndependence
+    LcdIndependence = $lcdIndependence
     DeviceId = $DeviceID
     LcdIndex = $LcdIndex
     ClockId = 625
