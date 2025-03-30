@@ -113,7 +113,7 @@ if ($lcdIndependenceList.Count -gt 1) {
     $selectedIndependence = $lcdIndependenceList[0]
 }
 
-if $lcdIndependence -eq 0 {
+if ($lcdIndependence -eq 0) {
     Write-Host "Setting LCD Index to 0." -ForegroundColor Yellow
     $LcdIndex = 0
     Write-Host "Setting LCD Clock ID to 625." -ForegroundColor Yellow
