@@ -109,8 +109,6 @@ if ($lcdIndependenceList.Count -gt 1) {
     Write-Host "`n------------------------------`n"
 
     $selectedIndependence = $lcdIndependenceList[$selection - 1]
-} else {
-    $selectedIndependence = $lcdIndependenceList[0]
 }
 
 if ($lcdIndependence -eq 0) {
