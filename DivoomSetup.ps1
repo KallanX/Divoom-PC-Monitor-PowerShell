@@ -83,8 +83,10 @@ $response = Invoke-RestMethod -Uri "https://app.divoom-gz.com/Channel/Get5LcdInf
 $lcdIndependenceList = $response.LcdIndependenceList
 
 if ($null -eq $lcdIndependenceList -or $lcdIndependenceList.Count -eq 0) {
-    Write-Host "No LCD Independence List found." -ForegroundColor Red
-    return
+    # If no LCD independence list is found, return None
+    Write-Host "No LCD Independence found. Assuming Pixoo64 or similar device." -ForegroundColor Yellow
+    Write-Host "Setting LCD Independence to 0." -ForegroundColor Yellow
+    $lcdIndependence = 0
 }
 
 # Select LCD Independence
@@ -107,19 +109,24 @@ if ($lcdIndependenceList.Count -gt 1) {
     Write-Host "`n------------------------------`n"
 
     $selectedIndependence = $lcdIndependenceList[$selection - 1]
-} else {
-    $selectedIndependence = $lcdIndependenceList[0]
 }
 
-# Get the LcdList *from the selected independence object*
-$lcdList = $selectedIndependence.LcdList
-Format-LcdList -Lcds $lcdList
+if ($lcdIndependence -eq 0) {
+    Write-Host "Setting LCD Index to 0." -ForegroundColor Yellow
+    $LcdIndex = 0
+    Write-Host "Setting LCD Clock ID to 625." -ForegroundColor Yellow
+    $LcdClockId = 625
+} else {
+    # Get the LcdList *from the selected independence object*
+    $lcdList = $selectedIndependence.LcdList
+    Format-LcdList -Lcds $lcdList
 
-$selectedLcd, $arrayIndex = Get-UserSelection -Devices $lcdList
+    $selectedLcd, $arrayIndex = Get-UserSelection -Devices $lcdList
 
-# Save the selected Index and Clock ID to the .env file
-$LcdIndex = $($arrayIndex)
-$LcdClockId = $($selectedLcd.LcdClockId)
+    # Save the selected Index and Clock ID to the .env file
+    $LcdIndex = $($arrayIndex)
+    $LcdClockId = $($selectedLcd.LcdClockId)
+}
 
 # Function to get all drive letters on the PC
 function Get-DriveLetters {
@@ -172,7 +179,7 @@ Write-Host "Sending configuration to the device..." -ForegroundColor Cyan
 # Send Select Clock to the Divoom Times Gate device
 $PostInfo = @{
     Command = "Channel/SetClockSelectId"
-    LcdIndependence = $selectedIndependence.LcdIndependence
+    LcdIndependence = $lcdIndependence
     DeviceId = $DeviceID
     LcdIndex = $LcdIndex
     ClockId = 625
