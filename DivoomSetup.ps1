@@ -82,15 +82,15 @@ function Format-LcdList {
 $response = Invoke-RestMethod -Uri "https://app.divoom-gz.com/Channel/Get5LcdInfoV2?DeviceType=LCD&DeviceId=$($DeviceID)"
 $lcdIndependenceList = $response.LcdIndependenceList
 
+# Select LCD Independence
 if ($null -eq $lcdIndependenceList -or $lcdIndependenceList.Count -eq 0) {
-    # If no LCD independence list is found, return None
     Write-Host "No LCD Independence found. Assuming Pixoo64 or similar device." -ForegroundColor Yellow
     Write-Host "Setting LCD Independence to 0." -ForegroundColor Yellow
     $lcdIndependence = 0
-}
-
-# Select LCD Independence
-if ($lcdIndependenceList.Count -gt 1) {
+} elseif ($lcdIndependenceList.Count -eq 1) {
+    Write-Host "Single LCD Group found. Auto-selecting Independence." -ForegroundColor Cyan
+    $selectedIndependence = $lcdIndependenceList[0]
+} else {
     Write-Host "Multiple LCD Groups (Independence) found. Please select one:" -ForegroundColor Cyan
     $i = 1
     foreach ($independence in $lcdIndependenceList) {
@@ -117,15 +117,18 @@ if ($lcdIndependence -eq 0) {
     Write-Host "Setting LCD Clock ID to 625." -ForegroundColor Yellow
     $LcdClockId = 625
 } else {
-    # Get the LcdList *from the selected independence object*
     $lcdList = $selectedIndependence.LcdList
-    Format-LcdList -Lcds $lcdList
+    
+    if ($null -ne $lcdList) {
+        Format-LcdList -Lcds $lcdList
+        $selectedLcd, $arrayIndex = Get-UserSelection -Devices $lcdList
 
-    $selectedLcd, $arrayIndex = Get-UserSelection -Devices $lcdList
-
-    # Save the selected Index and Clock ID to the .env file
-    $LcdIndex = $($arrayIndex)
-    $LcdClockId = $($selectedLcd.LcdClockId)
+        # Save the selected Index and Clock ID
+        $LcdIndex = $($arrayIndex)
+        $LcdClockId = $($selectedLcd.LcdClockId)
+    } else {
+        Write-Error "Error: The selected LCD Independence group does not contain an LCD List."
+    }
 }
 
 # Function to get all drive letters on the PC

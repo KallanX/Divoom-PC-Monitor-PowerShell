@@ -88,7 +88,7 @@ while ($true) {
     # Determine if the CPU is Intel or AMD (Improved method)
     try {
         $cpu = $computer.Hardware | Where-Object { $_.HardwareType -eq "Cpu" }
-        if ($cpu -ne $null) {
+        if ($null -ne $cpu) {
             $cpu.Update() # Update is needed here.
             if($cpu.Name -like "*AMD*") {
                 $isAmd = $true
@@ -155,12 +155,12 @@ while ($true) {
         $gpuTemp = $null
 
         # Get GPU Temperature & Load
-        $gpu.Sensors | ForEach-Object {
-            if ($_.SensorType -eq "Temperature" -and $_.Name -like "*Core*") {
-                $gpuTemp = [math]::Round([float]$_.Value)
+        foreach ($sensor in $gpu.Sensors) {
+            if ($sensor.SensorType -eq [LibreHardwareMonitor.Hardware.SensorType]::Temperature -and $sensor.Name -like "*Core*") {
+                $gpuTemp = [math]::Round([float]$sensor.Value)
             }
-            elseif ($_.SensorType -eq "Load" -and $_.Name -like "*GPU Core*") {
-                $gpuUsage = [math]::Round([float]$_.Value)
+            elseif ($sensor.SensorType -eq [LibreHardwareMonitor.Hardware.SensorType]::Load -and $sensor.Name -like "*GPU Core*") {
+                $gpuUsage = [math]::Round([float]$sensor.Value)
             }
         }
     } elseif ($detectedGPU.Name -like "*Intel*") {
